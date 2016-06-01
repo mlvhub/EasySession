@@ -52,7 +52,7 @@ public class EasySession<Element: SessionMappable> {
         return EasySession.keysToDict(Element.keys())
     }
     
-    private class func keysToDict(arr: [String], dict: [String: String] = [:]) -> [String: String] {
+    internal class func keysToDict(arr: [String], dict: [String: String] = [:]) -> [String: String] {
         guard let head = arr.first else {
             return dict
         }
@@ -62,13 +62,13 @@ public class EasySession<Element: SessionMappable> {
         return keysToDict(Array(arr[1..<arr.count]), dict: new_dict)
     }
     
-    public func store(state: Element) -> Bool {
+    internal func store(state: Element) -> Bool {
         return state.toDictionary()
             .map { (key, value) in KeychainWrapper.setString(value, forKey: key) }
             .reduce(true, combine: { $0 && $1 })
     }
     
-    public func remove(state: Element) -> Bool {
+    internal func remove(state: Element) -> Bool {
         return state.toDictionary()
             .map { (key, _) in KeychainWrapper.removeObjectForKey(key) }
             .reduce(true, combine: { $0 && $1 })
