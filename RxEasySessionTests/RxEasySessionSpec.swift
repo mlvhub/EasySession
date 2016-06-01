@@ -77,6 +77,30 @@ class RxEasySessionSpec: QuickSpec {
 
         }
         
+        it("should sent events correctly when there is an existing previous session") {
+            let user = User(id: 1, email: "john.doe@example.com", name: "John Doe")
+            sut.authenticate(user)
+            
+            sut = nil
+            
+            driveOnScheduler(scheduler) {
+                sut = RxEasySession<User>()
+            }
+            
+            let observer = scheduler.createObserver(SessionStatus<User>)
+            
+            sut.rx_state.asObservable().subscribe(observer).addDisposableTo(disposeBag)
+            
+            scheduler.start()
+            
+            let expectedEvents: [Recorded<Event<SessionStatus<User>>>] = [
+                next(0, SessionStatus.Authenticated(user)),
+            ]
+            
+            XCTAssertEqual(observer.events, expectedEvents)
+            
+        }
+        
         it("dummy test to avoid a bug where the last test is not reported") {}
         
     }
